@@ -1,0 +1,100 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["fullTextSearch", "fullTextIndex"]
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+  //TODO Remove in test
+  // shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
+}
+
+model User {
+  id           String         @id @default(uuid())
+  name         String
+  email        String         @unique
+  password     String
+  Folder       Folder[]
+  List         List[]
+  Note         Note[]
+  RefreshToken RefreshToken[]
+  isVerified   Boolean        @default(false)
+}
+
+model Folder {
+  id           String   @id @default(uuid())
+  author       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId       String
+  name         String
+  Folder       Folder[] @relation("ParentFolder")
+  List         List[]
+  Note         Note[]
+  parentFolder Folder?  @relation("ParentFolder", fields: [folderId], references: [id], onDelete: Cascade)
+  folderId     String?
+}
+
+model List {
+  id         String     @id @default(uuid())
+  author     User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId     String
+  name       String
+  isFavorite Boolean    @default(false)
+  isArchive  Boolean    @default(false)
+  isToDo     Boolean
+  hasLinks   Boolean
+  hasRatings Boolean
+  color      String     @default("default")
+  ListItem   ListItem[]
+  tags       Tag[]
+  updatedAt  DateTime   @updatedAt
+  folder     Folder?    @relation(fields: [folderId], references: [id], onDelete: Cascade)
+  folderId   String?
+
+  @@fulltext([name])
+}
+
+model ListItem {
+  id        String   @id @default(uuid())
+  order     Int
+  name      String   @db.Text
+  isChecked Boolean
+  rate      Decimal?
+  link      String?
+  list      List     @relation(fields: [listId], references: [id], onDelete: Cascade)
+  listId    String
+}
+
+model Note {
+  id         String   @id @default(uuid())
+  author     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId     String
+  name       String
+  content    String   @db.Text
+  color      String   @default("default")
+  isFavorite Boolean  @default(false)
+  isArchive  Boolean  @default(false)
+  tags       Tag[]
+  updatedAt  DateTime @updatedAt
+  Folder     Folder?  @relation(fields: [folderId], references: [id], onDelete: Cascade)
+  folderId   String?
+
+  @@fulltext([name])
+}
+
+model Tag {
+  id    String @id @default(uuid())
+  lists List[]
+  notes Note[]
+}
+
+model RefreshToken {
+  id        String   @id @default(uuid())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  token     String   @db.Text
+  createdAt DateTime @default(now())
+}
