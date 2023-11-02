@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
-import prisma from '../db/prismaClient';
-import { AuthenticatedRequest } from '../customTypes/AuthenticatedRequest';
+import prisma from '../../db/prismaClient';
+import { AuthenticatedRequest } from '../../customTypes/AuthenticatedRequest';
 
 export async function getNoteContent(
   req: AuthenticatedRequest,

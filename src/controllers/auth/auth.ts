@@ -2,11 +2,10 @@ import * as EmailValidator from 'email-validator';
 import { Request, Response } from 'express';
 import bcrypt from 'bcrypt';
 import { Prisma } from '@prisma/client';
-import prisma from '../db/prismaClient';
+import prisma from '../../db/prismaClient';
 import ms from 'ms';
-import jwt, { JwtPayload, Secret } from 'jsonwebtoken';
-import { AuthenticatedRequest } from '../customTypes/AuthenticatedRequest';
-import { link } from 'fs';
+import jwt from 'jsonwebtoken';
+import { AuthenticatedRequest } from '../../customTypes/AuthenticatedRequest';
 
 //Env variables imports
 import {
@@ -20,16 +19,14 @@ import {
   CHANGE_PASSWORD_TOKEN_SECRET,
   CHANGE_PASSWORD_TOKEN_EXPIRATION,
   CHANGE_EMAIL_TOKEN_SECRET,
-  CHANGE_EMAIL_TOKEN_EXPIRATION,
   CLIENT_HOST_URL,
   PASSWORD_REGEX
-} from '../utils/envVariables';
+} from '../../utils/envVariables';
 
 //Emailing imports
-import { transporter } from '../emailing/transporter';
-import { getVerificationEmail } from '../emailing/getVerificationEmail';
-import { getEmailChangeEmail } from '../emailing/getEmailChangeEmail';
-import { getNewPasswordEmail } from '../emailing/getNewPasswordEmail';
+import { transporter } from '../../emailing/transporter';
+import { getVerificationEmail } from '../../emailing/getVerificationEmail';
+import { getNewPasswordEmail } from '../../emailing/getNewPasswordEmail';
 
 //Promisifies version of jwt verify
 //TODO Convert to ES import
@@ -55,11 +52,10 @@ export async function signupUser(req: Request, res: Response): Promise<any> {
     return res.status(400).send('Error: email is not valid');
   }
 
-  //TODO UNCOMMENT
   //Checking password complexity in case of forged request
-  // if (!req.body.password.match(passwordRegex)) {
-  //   return res.status(400).send('Error: password is not valid');
-  // }
+  if (!req.body.password.match(passwordRegex)) {
+    return res.status(400).send('Error: chosen password is not valid');
+  }
 
   try {
     const hashedPassword = await bcrypt.hash(req.body.password, 10);
@@ -201,145 +197,6 @@ export async function loginUser(req: Request, res: Response): Promise<any> {
   }
 }
 
-export async function updateUser(
-  req: AuthenticatedRequest,
-  res: Response
-): Promise<any> {
-  //Checking if name is valid (if its at least one character long and at most 50 characters long)
-  if (
-    (req.body.name && req.body.name.length === 0) ||
-    (req.body.name && req.body.name.length >= 50)
-  ) {
-    return res.status(401).send('Error: provided user name is not valid');
-  }
-
-  //Checking if an email adress was provided and if it's valid
-  if (req.body.newEmail && !EmailValidator.validate(req.body.newEmail)) {
-    return res.status(401).send('Error: provided new email is not valid');
-  }
-
-  //Checking password complexity
-  if (req.body.newPassword && !req.body.newPassword.match(passwordRegex)) {
-    return res.status(400).send('Error: provided new password is not valid');
-  }
-
-  //Checking if the current password was submitted
-  if (!req.body.currentPassword) {
-    return res.status(401).send('Error: Please fill in your password');
-  }
-
-  try {
-    const user = await prisma.user.findUnique({
-      where: {
-        id: req.userId
-      }
-    });
-
-    //If the user was not found
-    if (user == null) {
-      return res.status(400).send('User not found');
-    }
-
-    //User was found => checking password
-    if (await bcrypt.compare(req.body.currentPassword, user.password)) {
-      //If a new email adress was provided, send an email containing a token:
-      if (req.body.newEmail) {
-        //Create the email change token
-        const emailChangeToken = jwt.sign(
-          { userId: user.id, userEmail: req.body.newEmail },
-          CHANGE_EMAIL_TOKEN_SECRET,
-          { expiresIn: CHANGE_EMAIL_TOKEN_EXPIRATION }
-        );
-
-        //Generating the email
-        const emailChangeEmail = getEmailChangeEmail(
-          req.body.newEmail,
-          emailChangeToken,
-          CLIENT_HOST_URL
-        );
-
-        //Preparing and sending the activation e-mail
-        const info = await transporter.sendMail(emailChangeEmail);
-
-        //Sending response
-        return res
-          .status(200)
-          .send('Confirmation email was sent to the provided adress');
-      }
-
-      //If no new email adress was provided:
-
-      //If the password is correct, prepare the update data
-      const userUpdateData = {
-        ...(req.body.newName !== undefined && { name: req.body.newName }),
-        //Encrypting password before storing it
-        ...(req.body.newPassword !== undefined && {
-          password: await bcrypt.hash(req.body.newPassword, 10)
-        })
-      };
-
-      //Password is correct = update info
-      const updatedUser = await prisma.user.update({
-        where: {
-          id: req.userId
-        },
-        data: userUpdateData
-      });
-
-      if (!updatedUser) {
-        res.status(500).send('Error: server error');
-      } else {
-        res.status(202).send('User was successfully updated');
-      }
-    } else {
-      return res.status(401).send('Error: password is incorrect');
-    }
-  } catch (error) {
-    console.error(error);
-    res.status(500).send('Error: server error');
-  }
-}
-
-export async function deleteUser(
-  req: AuthenticatedRequest,
-  res: Response
-): Promise<any> {
-  //Checking if the password was submitted
-  if (!req.body.password) {
-    return res.status(400).send('Please fill in your password');
-  }
-
-  try {
-    //Finding the user in the database
-    const user = await prisma.user.findUnique({
-      where: {
-        id: req.userId
-      }
-    });
-
-    //If the user was not found
-    if (user == null) {
-      return res.status(400).send('Error: user not found');
-    }
-
-    //User is found => checking the passowrd
-    if (await bcrypt.compare(req.body.password, user.password)) {
-      const deletedUser = await prisma.user.delete({
-        where: {
-          id: req.userId
-        }
-      });
-
-      return res.status(202).send('User deleted');
-    } else {
-      return res.status(401).send('Invalid password');
-    }
-  } catch (error) {
-    console.error(error);
-    res.status(500).send('Server error');
-  }
-}
-
 export async function refreshUserToken(
   req: Request,
   res: Response
@@ -473,31 +330,6 @@ export async function logoutUserEverywhereElse(
     res
       .status(200)
       .send('User has been logged out from everywhere except this device');
-  } catch (error: any) {
-    res.status(500).send('Error: server error');
-  }
-}
-
-export async function getUserInfo(
-  req: AuthenticatedRequest,
-  res: Response
-): Promise<any> {
-  try {
-    const user = await prisma.user.findUnique({
-      where: {
-        id: req.userId
-      }
-    });
-
-    if (!user) {
-      return res.status(410).send('Error: user does not exist');
-    }
-
-    res.status(200).json({
-      id: user?.id,
-      name: user?.name,
-      email: user?.email
-    });
   } catch (error: any) {
     res.status(500).send('Error: server error');
   }

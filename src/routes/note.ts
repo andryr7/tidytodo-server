@@ -1,6 +1,11 @@
-import express from "express"
-import { authenticateToken } from '../middleware/authenticateToken'
-import { createNote, deleteNote, getNoteContent, updateNote } from "../controllers/note";
+import express from 'express';
+import { authenticateToken } from '../middleware/authenticateToken';
+import {
+  createNote,
+  deleteNote,
+  getNoteContent,
+  updateNote
+} from '../controllers/note/note';
 
 export const noteRouter = express.Router();
 

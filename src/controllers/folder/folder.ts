@@ -1,14 +1,17 @@
-import { Response } from 'express'
-import prisma from '../db/prismaClient'
-import { transformFolderStructure } from '../utils/transformFolderStructure';
-import { AuthenticatedRequest } from '../customTypes/AuthenticatedRequest';
+import { Response } from 'express';
+import prisma from '../../db/prismaClient';
+import { transformFolderStructure } from '../../utils/transformFolderStructure';
+import { AuthenticatedRequest } from '../../customTypes/AuthenticatedRequest';
 import { Folder } from '@prisma/client';
 
 //See https://stackoverflow.com/questions/65749916/what-is-the-correct-type-for-this-handler for type declaration
-export async function getAllFolders(req: AuthenticatedRequest, res: Response):Promise<any> {
+export async function getAllFolders(
+  req: AuthenticatedRequest,
+  res: Response
+): Promise<any> {
   try {
     const userFolders = await prisma.folder.findMany({
-      where: { userId: req.userId},
+      where: { userId: req.userId },
       select: {
         id: true,
         name: true,
@@ -17,14 +20,17 @@ export async function getAllFolders(req: AuthenticatedRequest, res: Response):Pr
       }
     });
     //Transforming the data structure to accomodate frontend component
-    const transformedFolders = transformFolderStructure(userFolders)
+    const transformedFolders = transformFolderStructure(userFolders);
     res.status(200).json(transformedFolders);
   } catch (error) {
     res.status(500).send('Server error');
   }
 }
 
-export async function getFolder(req: AuthenticatedRequest, res: Response):Promise<any> {
+export async function getFolder(
+  req: AuthenticatedRequest,
+  res: Response
+): Promise<any> {
   try {
     const folder = await prisma.folder.findUnique({
       where: { id: req.params.folderid }
@@ -35,7 +41,10 @@ export async function getFolder(req: AuthenticatedRequest, res: Response):Promis
   }
 }
 
-export async function getFolderWithContent(req: AuthenticatedRequest, res: Response):Promise<any> {
+export async function getFolderWithContent(
+  req: AuthenticatedRequest,
+  res: Response
+): Promise<any> {
   try {
     const requestedFolderId = req.params.folderid;
 
@@ -44,13 +53,13 @@ export async function getFolderWithContent(req: AuthenticatedRequest, res: Respo
       case 'root':
         const rootFolderContent = await prisma.$transaction([
           prisma.folder.findMany({
-            where: { userId: req.userId, folderId: null}
+            where: { userId: req.userId, folderId: null }
           }),
           prisma.list.findMany({
-            where: { userId: req.userId, folderId: null}
+            where: { userId: req.userId, folderId: null }
           }),
           prisma.note.findMany({
-            where: { userId: req.userId, folderId: null}
+            where: { userId: req.userId, folderId: null }
           })
         ]);
         const [Folders, Lists, Notes] = rootFolderContent;
@@ -67,7 +76,7 @@ export async function getFolderWithContent(req: AuthenticatedRequest, res: Respo
 
         return res.status(200).json(rootFolder);
       //Else, get and send folder data
-      default :
+      default:
         const folderWithContent = await prisma.folder.findUnique({
           where: {
             id: req.params.folderid
@@ -77,7 +86,7 @@ export async function getFolderWithContent(req: AuthenticatedRequest, res: Respo
             Note: true,
             List: true
           }
-        })
+        });
 
         return res.status(200).json(folderWithContent);
     }
@@ -86,7 +95,10 @@ export async function getFolderWithContent(req: AuthenticatedRequest, res: Respo
   }
 }
 
-export async function createFolder(req: AuthenticatedRequest, res: Response):Promise<any> {
+export async function createFolder(
+  req: AuthenticatedRequest,
+  res: Response
+): Promise<any> {
   try {
     const newFolder = await prisma.folder.create({
       data: {
@@ -94,7 +106,7 @@ export async function createFolder(req: AuthenticatedRequest, res: Response):Pro
         name: req.body.name,
         folderId: req.body.folderId
       }
-    })
+    });
     res.status(201).json(newFolder);
   } catch (error) {
     console.error(error);
@@ -102,8 +114,11 @@ export async function createFolder(req: AuthenticatedRequest, res: Response):Pro
   }
 }
 
-export async function updateFolder(req: AuthenticatedRequest, res: Response):Promise<any> {
-  if(req.params.folderid === req.body.folderId) {
+export async function updateFolder(
+  req: AuthenticatedRequest,
+  res: Response
+): Promise<any> {
+  if (req.params.folderid === req.body.folderId) {
     return res.status(400).send('Error: Folder cannot be inside of itself');
   }
   try {
@@ -116,9 +131,9 @@ export async function updateFolder(req: AuthenticatedRequest, res: Response):Pro
       },
       data: {
         name: req.body.name,
-        folderId: req.body.folderId === 'root' ? null : req.body.folderId,
+        folderId: req.body.folderId === 'root' ? null : req.body.folderId
       }
-    })
+    });
     res.status(202).json(updatedFolder);
   } catch (error) {
     console.error(error);
@@ -126,17 +141,20 @@ export async function updateFolder(req: AuthenticatedRequest, res: Response):Pro
   }
 }
 
-export async function deleteFolder(req: AuthenticatedRequest, res: Response):Promise<any> {
+export async function deleteFolder(
+  req: AuthenticatedRequest,
+  res: Response
+): Promise<any> {
   try {
     const deletedFolder = await prisma.folder.delete({
       where: {
         id: req.params.folderid,
         userId: req.userId
       }
-    })
+    });
 
-    if(!deletedFolder) {
-      return res.status(400).send("Bad request")
+    if (!deletedFolder) {
+      return res.status(400).send('Bad request');
     } else {
       res.status(202).json(deletedFolder);
     }

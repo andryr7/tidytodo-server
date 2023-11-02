@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
-import prisma from '../db/prismaClient';
-import { AuthenticatedRequest } from '../customTypes/AuthenticatedRequest';
-import { preprocessSearchTerms } from '../utils/preprocessSearchTerms';
+import prisma from '../../db/prismaClient';
+import { AuthenticatedRequest } from '../../customTypes/AuthenticatedRequest';
+import { preprocessSearchTerms } from '../../utils/preprocessSearchTerms';
 
 export async function getSearchedElements(
   req: AuthenticatedRequest,

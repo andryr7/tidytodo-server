@@ -6,25 +6,27 @@ import { noteRouter } from './src/routes/note';
 import { listItemRouter } from './src/routes/listitem';
 import cors from 'cors';
 import { documentRouter } from './src/routes/document';
-import { HOST_PORT } from './src/utils/envVariables';
+import { CLIENT_HOST_URL, HOST_PORT } from './src/utils/envVariables';
+import { authRouter } from './src/routes/auth';
 
 const app = express();
 
-//TODO Restrict origin with env variables
+//move
 app.use(
   cors({
-    origin: ['http://localhost:5173', 'https://tidytodo.andryratsimba.com']
+    origin: ['http://localhost:5173', CLIENT_HOST_URL]
   })
 );
 
 app.use(express.json());
+app.use('/auth', authRouter);
 app.use('/user', userRouter);
-app.use('/folder', folderRouter);
-app.use('/list', listRouter);
-app.use('/note', noteRouter);
-app.use('/listitem', listItemRouter);
 app.use('/document', documentRouter);
+app.use('/note', noteRouter);
+app.use('/list', listRouter);
+app.use('/listitem', listItemRouter);
+app.use('/folder', folderRouter);
 
 app.listen(HOST_PORT, () =>
-  console.log(`TidyToDo backend is ready on port ${HOST_PORT}`)
+  console.log(`TidyTodo backend is ready on port ${HOST_PORT}`)
 );

@@ -10,7 +10,7 @@ export const ACCESS_TOKEN_EXPIRATION: string =
 export const REFRESH_TOKEN_MAX_COUNT: number = parseInt(
   process.env.REFRESH_TOKEN_MAX_COUNT!
 );
-export const REFRESH_TOKEN_SECRET: Secret = process.env.ACCESS_TOKEN_SECRET!;
+export const REFRESH_TOKEN_SECRET: Secret = process.env.REFRESH_TOKEN_SECRET!;
 export const REFRESH_TOKEN_EXPIRATION: string =
   process.env.REFRESH_TOKEN_EXPIRATION!;
 //Email verification variables

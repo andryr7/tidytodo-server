@@ -1,6 +1,11 @@
-import express from "express"
-import { authenticateToken } from '../middleware/authenticateToken'
-import { getArchivedElements, getFavoriteElements, getLastUpdatedElements, getSearchedElements } from "../controllers/document";
+import express from 'express';
+import { authenticateToken } from '../middleware/authenticateToken';
+import {
+  getArchivedElements,
+  getFavoriteElements,
+  getLastUpdatedElements,
+  getSearchedElements
+} from '../controllers/document/document';
 
 export const documentRouter = express.Router();
 
