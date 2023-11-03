@@ -34,6 +34,7 @@ const util = require('util');
 const verifyAsync = util.promisify(jwt.verify);
 
 //Setting up the password regex matching
+//Password validation: 8 letters, Caps, Mins, 1 number, 1 special character (@$!%*?&)
 const passwordRegex = new RegExp(PASSWORD_REGEX);
 
 export async function signupUser(req: Request, res: Response): Promise<any> {
@@ -53,10 +54,9 @@ export async function signupUser(req: Request, res: Response): Promise<any> {
   }
 
   //Checking password complexity in case of forged request
-  //TODO FIX AND UNCOMMENT
-  // if (!req.body.password.match(passwordRegex)) {
-  //   return res.status(400).send('Error: chosen password is not valid');
-  // }
+  if (!req.body.password.match(passwordRegex)) {
+    return res.status(400).send('Error: chosen password is not valid');
+  }
 
   try {
     const hashedPassword = await bcrypt.hash(req.body.password, 10);
@@ -542,10 +542,9 @@ export async function setNewPassword(
     }
 
     //Checking password complexity in case of forged request
-    //TODO FIX AND UNCOMMENT
-    // if (!newPassword.match(passwordRegex)) {
-    //   return res.status(400).send('Error: new password is not valid');
-    // }
+    if (!newPassword.match(passwordRegex)) {
+      return res.status(400).send('Error: new password is not valid');
+    }
 
     //Initializing a variable to store the user id extracted from the token
     let userId;
