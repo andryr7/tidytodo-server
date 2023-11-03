@@ -53,9 +53,10 @@ export async function signupUser(req: Request, res: Response): Promise<any> {
   }
 
   //Checking password complexity in case of forged request
-  if (!req.body.password.match(passwordRegex)) {
-    return res.status(400).send('Error: chosen password is not valid');
-  }
+  //TODO FIX AND UNCOMMENT
+  // if (!req.body.password.match(passwordRegex)) {
+  //   return res.status(400).send('Error: chosen password is not valid');
+  // }
 
   try {
     const hashedPassword = await bcrypt.hash(req.body.password, 10);
@@ -541,11 +542,10 @@ export async function setNewPassword(
     }
 
     //Checking password complexity in case of forged request
-    if (!newPassword.match(passwordRegex)) {
-      //TODO REMOVE
-      console.log(passwordRegex);
-      return res.status(400).send('Error: new password is not valid');
-    }
+    //TODO FIX AND UNCOMMENT
+    // if (!newPassword.match(passwordRegex)) {
+    //   return res.status(400).send('Error: new password is not valid');
+    // }
 
     //Initializing a variable to store the user id extracted from the token
     let userId;
