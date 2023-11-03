@@ -526,21 +526,29 @@ export async function setNewPassword(
   res: Response
 ): Promise<any> {
   try {
-    //Extracting the password reset token from the request
+    //Extracting the password reset token and password from the request
     const passwordResetToken = req.body.token;
+    const newPassword = req.body.newPassword;
 
-    //If the token is note present in the request
+    //If the token is not present in the request
     if (!passwordResetToken) {
       return res.status(400).send('Error: bad reset password token');
     }
 
-    //Initializing a variable to store the user id extracted from the token
-    let userId;
+    //If no password was submitted in the request
+    if (!newPassword || newPassword.length === 0) {
+      return res.status(400).send('Error: no new password was provided');
+    }
 
     //Checking password complexity in case of forged request
-    if (!req.body.newPassword || !req.body.newPassword.match(passwordRegex)) {
-      return res.status(400).send('Error: password is not valid');
+    if (!newPassword.match(passwordRegex)) {
+      //TODO REMOVE
+      console.log(passwordRegex);
+      return res.status(400).send('Error: new password is not valid');
     }
+
+    //Initializing a variable to store the user id extracted from the token
+    let userId;
 
     //Verifying the token and its expiration
     try {
