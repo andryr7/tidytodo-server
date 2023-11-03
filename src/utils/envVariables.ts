@@ -31,7 +31,7 @@ export const CHANGE_EMAIL_TOKEN_EXPIRATION: string =
 
 //Password variables
 export const PASSWORD_REGEX: string =
-  '^(?=.*[a-z])(?=.*[A-Z])(?=.*d)(?=.*[@$!%*?&])[A-Za-zd@$!%*?&]{8,}$';
+  '^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$';
 
 //Hosting variables
 export const CLIENT_HOST_URL: string = process.env.CLIENT_HOST_URL!;
