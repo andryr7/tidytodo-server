@@ -1,10 +1,10 @@
 import express from 'express';
+import cors from 'cors';
 import { userRouter } from './src/routes/user';
 import { folderRouter } from './src/routes/folder';
 import { listRouter } from './src/routes/list';
 import { noteRouter } from './src/routes/note';
 import { listItemRouter } from './src/routes/listitem';
-import cors from 'cors';
 import { documentRouter } from './src/routes/document';
 import { CLIENT_HOST_URL, HOST_PORT } from './src/utils/envVariables';
 import { authRouter } from './src/routes/auth';
