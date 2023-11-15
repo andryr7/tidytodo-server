@@ -13,7 +13,7 @@ import {
 
 //Emailing imports
 import { transporter } from '../../emailing/transporter';
-import { getVerificationEmail } from '../../emailing/getActivationEmail';
+import { getActivationEmail } from '../../emailing/getActivationEmail';
 
 //Setting up the password regex matching
 //Password validation: 8 letters, Caps, Mins, 1 number, 1 special character (@$!%*?&)
@@ -60,7 +60,7 @@ export async function sendNewUserEmailVerificationEmail(
       );
 
       //Generating the email
-      const verificationEmail = getVerificationEmail(
+      const verificationEmail = getActivationEmail(
         user.email,
         verifyUserToken,
         CLIENT_HOST_URL
