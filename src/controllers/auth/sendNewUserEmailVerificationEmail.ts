@@ -13,7 +13,7 @@ import {
 
 //Emailing imports
 import { transporter } from '../../emailing/transporter';
-import { getVerificationEmail } from '../../emailing/getVerificationEmail';
+import { getVerificationEmail } from '../../emailing/getActivationEmail';
 
 //Setting up the password regex matching
 //Password validation: 8 letters, Caps, Mins, 1 number, 1 special character (@$!%*?&)
