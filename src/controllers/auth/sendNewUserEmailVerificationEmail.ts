@@ -7,17 +7,12 @@ import jwt from 'jsonwebtoken';
 import {
   VERIFY_EMAIL_TOKEN_SECRET,
   VERIFY_EMAIL_TOKEN_EXPIRATION,
-  CLIENT_HOST_URL,
-  PASSWORD_REGEX
+  CLIENT_HOST_URL
 } from '../../utils/envVariables';
 
 //Emailing imports
 import { transporter } from '../../emailing/transporter';
 import { getActivationEmail } from '../../emailing/getActivationEmail';
-
-//Setting up the password regex matching
-//Password validation: 8 letters, Caps, Mins, 1 number, 1 special character (@$!%*?&)
-const passwordRegex = new RegExp(PASSWORD_REGEX);
 
 export async function sendNewUserEmailVerificationEmail(
   req: Request,
