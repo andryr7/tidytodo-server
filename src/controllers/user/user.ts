@@ -59,6 +59,10 @@ export async function updateUser(
       return res.status(400).send('User not found');
     }
 
+    if (user.isDemo === true) {
+      return res.status(472).send('Demo account cannot be altered');
+    }
+
     //User was found => checking password
     if (await bcrypt.compare(req.body.currentPassword, user.password)) {
       //If a new email adress was provided, send an email containing a token:
@@ -139,6 +143,10 @@ export async function deleteUser(
     //If the user was not found
     if (user == null) {
       return res.status(400).send('Error: user not found');
+    }
+
+    if (user.isDemo === true) {
+      return res.status(472).send('Demo account cannot be deleted');
     }
 
     //User is found => checking the passowrd

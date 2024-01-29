@@ -23,6 +23,7 @@ model User {
   Note         Note[]
   RefreshToken RefreshToken[]
   isVerified   Boolean        @default(false)
+  isDemo       Boolean        @default(false)
 }
 
 model Folder {
