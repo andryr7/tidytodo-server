@@ -185,7 +185,8 @@ export async function getUserInfo(
     res.status(200).json({
       id: user?.id,
       name: user?.name,
-      email: user?.email
+      email: user?.email,
+      isDemo: user?.isDemo
     });
   } catch (error: any) {
     res.status(500).send('Error: server error');
