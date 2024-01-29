@@ -59,6 +59,10 @@ export async function updateUser(
       return res.status(400).send('User not found');
     }
 
+    if (user.isDemo === true) {
+      return res.status(472).send('Demo account cannot be altered');
+    }
+
     //User was found => checking password
     if (await bcrypt.compare(req.body.currentPassword, user.password)) {
       //If a new email adress was provided, send an email containing a token:
@@ -141,6 +145,10 @@ export async function deleteUser(
       return res.status(400).send('Error: user not found');
     }
 
+    if (user.isDemo === true) {
+      return res.status(472).send('Demo account cannot be deleted');
+    }
+
     //User is found => checking the passowrd
     if (await bcrypt.compare(req.body.password, user.password)) {
       const deletedUser = await prisma.user.delete({
@@ -177,7 +185,8 @@ export async function getUserInfo(
     res.status(200).json({
       id: user?.id,
       name: user?.name,
-      email: user?.email
+      email: user?.email,
+      isDemo: user?.isDemo
     });
   } catch (error: any) {
     res.status(500).send('Error: server error');
