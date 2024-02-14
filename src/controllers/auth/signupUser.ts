@@ -9,7 +9,6 @@ import jwt from 'jsonwebtoken';
 import {
   VERIFY_EMAIL_TOKEN_SECRET,
   VERIFY_EMAIL_TOKEN_EXPIRATION,
-  CLIENT_HOST_URL,
   PASSWORD_REGEX
 } from '../../utils/envVariables';
 
@@ -65,8 +64,7 @@ export async function signupUser(req: Request, res: Response): Promise<any> {
       //Generating the email
       const verificationEmail = getActivationEmail(
         newUser.email,
-        verifyUserToken,
-        CLIENT_HOST_URL
+        verifyUserToken
       );
 
       //Preparing and sending the activation e-mail

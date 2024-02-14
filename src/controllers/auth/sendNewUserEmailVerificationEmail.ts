@@ -6,8 +6,7 @@ import jwt from 'jsonwebtoken';
 //Env variables imports
 import {
   VERIFY_EMAIL_TOKEN_SECRET,
-  VERIFY_EMAIL_TOKEN_EXPIRATION,
-  CLIENT_HOST_URL
+  VERIFY_EMAIL_TOKEN_EXPIRATION
 } from '../../utils/envVariables';
 
 //Emailing imports
@@ -55,11 +54,7 @@ export async function sendNewUserEmailVerificationEmail(
       );
 
       //Generating the email
-      const verificationEmail = getActivationEmail(
-        user.email,
-        verifyUserToken,
-        CLIENT_HOST_URL
-      );
+      const verificationEmail = getActivationEmail(user.email, verifyUserToken);
 
       //Preparing and sending the activation e-mail
       const info = await transporter.sendMail(verificationEmail);

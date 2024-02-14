@@ -9,7 +9,6 @@ import { AuthenticatedRequest } from '../../customTypes/AuthenticatedRequest';
 import {
   CHANGE_EMAIL_TOKEN_SECRET,
   CHANGE_EMAIL_TOKEN_EXPIRATION,
-  CLIENT_HOST_URL,
   PASSWORD_REGEX
 } from '../../utils/envVariables';
 
@@ -77,8 +76,7 @@ export async function updateUser(
         //Generating the email
         const emailChangeEmail = getEmailChangeEmail(
           req.body.newEmail,
-          emailChangeToken,
-          CLIENT_HOST_URL
+          emailChangeToken
         );
 
         //Preparing and sending the activation e-mail

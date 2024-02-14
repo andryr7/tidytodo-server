@@ -5,8 +5,7 @@ import jwt from 'jsonwebtoken';
 //Env variables imports
 import {
   CHANGE_PASSWORD_TOKEN_SECRET,
-  CHANGE_PASSWORD_TOKEN_EXPIRATION,
-  CLIENT_HOST_URL
+  CHANGE_PASSWORD_TOKEN_EXPIRATION
 } from '../../utils/envVariables';
 
 //Emailing imports
@@ -56,8 +55,7 @@ export async function sendPasswordResetEmail(
     //Generating the email
     const changePasswordEmail = getNewPasswordEmail(
       user.email,
-      changePasswordToken,
-      CLIENT_HOST_URL
+      changePasswordToken
     );
 
     //Preparing and sending the activation e-mail
